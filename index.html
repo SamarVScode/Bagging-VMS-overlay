@@ -119,32 +119,26 @@
     .s-hint strong { color: var(--muted); }
     .s-hint code { color: var(--blue); background: var(--blue-light); padding: 1px 5px; border-radius: 4px; font-family: monospace; }
 
-    /* ── Camera Overlay — light, side-by-side ── */
+    /* ── Camera Overlay — fullscreen video ─── */
     #cam-overlay {
       display: none; position: fixed; inset: 0; z-index: 999999;
       background: rgba(244,246,249,0.97);
       backdrop-filter: blur(10px);
+      flex-direction: column;
       align-items: center; justify-content: center;
-      padding: 24px; gap: 20px;
+      padding: 24px; gap: 16px;
     }
     #cam-overlay.active { display: flex; }
 
-    .cam-layout {
-      width: 100%; max-width: 1000px;
-      display: flex; gap: 20px; align-items: stretch;
-    }
-
-    /* Left: video feed */
     .cam-feed {
-      flex: 3;
-      background: #0f172a;
+      width: 100%; max-width: 780px;
+      background: #000;
       border-radius: 16px;
       overflow: hidden;
       border: 1.5px solid var(--border);
       box-shadow: 0 8px 24px rgba(0,0,0,0.12);
       position: relative;
-      min-height: 380px;
-      display: flex; align-items: center; justify-content: center;
+      aspect-ratio: 16/9;
     }
     #bridge-video { width: 100%; height: 100%; object-fit: cover; display: block; }
 
@@ -158,44 +152,32 @@
       background: #fef2f2; border: 1px solid #fecaca;
       padding: 5px 12px; border-radius: 99px;
       font-size: 12px; font-weight: 800; color: #dc2626;
-      font-family: 'SF Mono', monospace;
+      font-family: monospace;
     }
     .rec-dot { width: 9px; height: 9px; background: #ef4444; border-radius: 50%; }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
     .rec-dot { animation: blink 1s ease-in-out infinite; }
+    .seal-pill {
+      background: var(--card); border: 1px solid var(--blue-border);
+      padding: 5px 12px; border-radius: 99px;
+      font-size: 12px; font-weight: 700; color: var(--blue);
+      font-family: monospace;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
     .timer-pill {
       background: var(--card); border: 1px solid var(--border);
       padding: 5px 12px; border-radius: 99px;
       font-size: 13px; font-weight: 700; color: var(--text);
-      font-family: 'SF Mono', monospace;
+      font-family: monospace;
       box-shadow: 0 1px 4px rgba(0,0,0,0.08);
     }
 
-    /* Right: controls panel */
-    .cam-panel {
-      flex: 1.2;
-      background: var(--card);
-      border: 1.5px solid var(--border);
-      border-radius: 16px;
-      padding: 24px 20px;
-      display: flex; flex-direction: column; gap: 16px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-      min-width: 220px;
+    .cam-controls {
+      display: flex; gap: 12px;
+      width: 100%; max-width: 780px;
     }
-    .cam-panel-title { font-size: 13px; font-weight: 700; color: var(--text); }
-    .cam-panel-sub   { font-size: 11.5px; color: var(--muted); line-height: 1.6; margin-top: 4px; }
-
-    .seal-tag-box {
-      background: var(--bg); border: 1px solid var(--border);
-      border-radius: 10px; padding: 14px;
-    }
-    .seal-tag-label { font-size: 10px; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 6px; }
-    .seal-tag-value { font-size: 14px; font-weight: 700; color: var(--blue); font-family: monospace; word-break: break-all; }
-
-    .cam-divider { border: none; border-top: 1px solid var(--border); }
-
     .cam-btn-done {
-      width: 100%; padding: 13px; border: none; border-radius: 11px;
+      flex: 1; padding: 13px; border: none; border-radius: 11px;
       background: var(--blue); color: #fff;
       font-size: 13px; font-weight: 700; cursor: pointer;
       box-shadow: 0 2px 8px rgba(37,99,235,0.25);
@@ -204,25 +186,18 @@
     }
     .cam-btn-done:hover { background: var(--blue-hover); }
     .cam-btn-done svg { width: 15px; height: 15px; }
-
     .cam-btn-cancel {
-      width: 100%; padding: 11px; border: 1px solid var(--border);
-      border-radius: 11px; background: var(--bg); color: var(--muted);
+      padding: 13px 20px; border: 1px solid var(--border);
+      border-radius: 11px; background: var(--card); color: var(--muted);
       font-size: 13px; font-weight: 600; cursor: pointer;
       transition: all 0.15s;
     }
-    .cam-btn-cancel:hover { background: var(--border); color: var(--text); }
+    .cam-btn-cancel:hover { background: var(--bg); color: var(--text); }
 
     #cam-error {
       font-size: 12px; color: #dc2626; background: #fef2f2;
       border: 1px solid #fecaca; border-radius: 8px;
-      padding: 10px 12px; display: none; line-height: 1.5;
-    }
-
-    /* ── Responsive: stack on small screens ──── */
-    @media (max-width: 640px) {
-      .cam-layout { flex-direction: column; }
-      .cam-feed { min-height: 240px; }
+      padding: 10px 14px; display: none; width: 100%; max-width: 780px;
     }
   </style>
 </head>
@@ -280,46 +255,31 @@
     </div>
   </div>
 
-  <!-- Camera Overlay — side by side -->
+  <!-- Camera Overlay — fullscreen video -->
   <div id="cam-overlay">
-    <div class="cam-layout">
 
-      <!-- Left: live video -->
-      <div class="cam-feed">
-        <div class="feed-badge-row">
-          <div class="rec-pill">
-            <span class="rec-dot"></span>
-            REC
-          </div>
-          <div class="timer-pill" id="recTimer">00:00</div>
+    <div id="cam-error"></div>
+
+    <div class="cam-feed">
+      <div class="feed-badge-row">
+        <div class="rec-pill">
+          <span class="rec-dot"></span>
+          REC
         </div>
-        <video id="bridge-video" autoplay playsinline muted></video>
+        <div class="seal-pill" id="sealDisplay">SEAL: --</div>
+        <div class="timer-pill" id="recTimer">00:00</div>
       </div>
-
-      <!-- Right: controls -->
-      <div class="cam-panel">
-        <div>
-          <div class="cam-panel-title">Camera Recording</div>
-          <div class="cam-panel-sub">Inspect the bagging, then click Done when finished.</div>
-        </div>
-
-        <div class="seal-tag-box">
-          <div class="seal-tag-label">Seal ID</div>
-          <div class="seal-tag-value" id="sealDisplay">--</div>
-        </div>
-
-        <hr class="cam-divider">
-
-        <div id="cam-error"></div>
-
-        <button class="cam-btn-done" onclick="finishRecording()">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-          Done — Scan Bag ID
-        </button>
-        <button class="cam-btn-cancel" onclick="cancelRecording()">Cancel</button>
-      </div>
-
+      <video id="bridge-video" autoplay playsinline muted></video>
     </div>
+
+    <div class="cam-controls">
+      <button class="cam-btn-done" onclick="finishRecording()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+        Done — Scan Bag ID
+      </button>
+      <button class="cam-btn-cancel" onclick="cancelRecording()">Cancel</button>
+    </div>
+
   </div>
 
   <script>
