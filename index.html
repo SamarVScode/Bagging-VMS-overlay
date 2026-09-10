@@ -350,9 +350,9 @@
 
       navigator.mediaDevices.getUserMedia({
         video: {
-          width:     { exact: 1280 },
-          height:    { exact: 720 },
-          frameRate: { ideal: 30, max: 30 }
+          width:     { ideal: 1280 },
+          height:    { ideal: 720 },
+          frameRate: { ideal: 24, max: 24 }
         },
         audio: false
       }).then(function(s) {
@@ -361,7 +361,7 @@
         var mime = 'video/webm;codecs=vp9';
         if (!MediaRecorder.isTypeSupported(mime)) mime = 'video/webm;codecs=vp8';
         if (!MediaRecorder.isTypeSupported(mime)) mime = 'video/webm';
-        recorder = new MediaRecorder(s, { mimeType: mime, videoBitsPerSecond: 2500000 });
+        recorder = new MediaRecorder(s, { mimeType: mime, videoBitsPerSecond: 800000 });
         recorder.ondataavailable = function(e) { if (e.data && e.data.size > 0) chunks.push(e.data); };
         recorder.start(1000);
         t0 = Date.now(); elapsed = 0; startISO = new Date().toISOString(); endISO = '';
