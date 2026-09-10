@@ -3,258 +3,226 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Bagging &amp; Seal Video Verification System</title>
+  <title>Bagging Verification System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --blue:        #2563eb;
+      --blue-hover:  #1d4ed8;
+      --blue-light:  #eff6ff;
+      --blue-border: #bfdbfe;
+      --bg:          #f4f6f9;
+      --card:        #ffffff;
+      --border:      #e4e8ef;
+      --text:        #111827;
+      --muted:       #6b7280;
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      background: #f1f5f9;
+      background: var(--bg);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       overflow: hidden;
+      -webkit-font-smoothing: antialiased;
     }
+
+    /* ── Iframe fills full screen ─────────────── */
     #app-frame { width: 100vw; height: 100vh; border: none; display: block; }
 
-    /* Settings Button */
+    /* ── Settings Button ──────────────────────── */
     #settings-btn {
       position: fixed;
-      top: 12px;
-      right: 12px;
+      top: 14px; right: 14px;
       z-index: 888888;
-      width: 34px;
-      height: 34px;
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
+      width: 34px; height: 34px;
+      background: var(--card);
+      border: 1px solid var(--border);
       border-radius: 50%;
-      color: #64748b;
+      color: var(--muted);
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
       transition: all 0.2s;
     }
-    #settings-btn:hover { background: #f8fafc; color: #1e293b; box-shadow: 0 2px 8px rgba(0,0,0,0.15); border-color: #cbd5e1; }
+    #settings-btn:hover { border-color: #cbd5e1; color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
     #settings-btn svg { width: 16px; height: 16px; }
 
-    /* Settings Modal */
+    /* ── Settings Modal ───────────────────────── */
     #settings-modal {
-      display: none;
-      position: fixed;
-      inset: 0;
+      display: none; position: fixed; inset: 0;
       z-index: 999998;
-      background: rgba(100,116,139,0.35);
+      background: rgba(107,114,128,0.3);
       backdrop-filter: blur(6px);
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
+      align-items: center; justify-content: center; padding: 16px;
     }
     #settings-modal.open { display: flex; }
 
-    .settings-card {
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 20px;
-      padding: 28px 24px;
-      width: 100%;
-      max-width: 520px;
-      box-shadow: 0 20px 40px -8px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.05);
+    .s-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 20px; padding: 28px 24px; width: 100%; max-width: 500px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.12);
     }
-    .settings-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 24px;
-    }
-    .settings-title {
-      font-size: 15px;
-      font-weight: 700;
-      color: #0f172a;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .settings-title svg { width: 18px; height: 18px; color: #64748b; }
-    .settings-close {
-      background: #f1f5f9;
-      border: 1px solid #e2e8f0;
-      color: #64748b;
-      width: 30px;
-      height: 30px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .s-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+    .s-title { font-size: 15px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 9px; }
+    .s-title svg { width: 17px; height: 17px; color: var(--muted); }
+    .s-close {
+      width: 28px; height: 28px; border-radius: 8px;
+      background: var(--bg); border: 1px solid var(--border);
+      color: var(--muted); cursor: pointer; font-size: 13px;
+      display: flex; align-items: center; justify-content: center;
       transition: all 0.15s;
     }
-    .settings-close:hover { color: #0f172a; background: #e2e8f0; }
+    .s-close:hover { background: var(--border); color: var(--text); }
 
-    .settings-label {
-      font-size: 11px;
-      font-weight: 700;
-      color: #94a3b8;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 8px;
+    .s-label { font-size: 11px; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 8px; }
+    .s-input {
+      width: 100%; background: var(--bg); border: 1.5px solid var(--border);
+      border-radius: 10px; padding: 12px 14px;
+      font-size: 12px; font-family: monospace; color: var(--text);
+      outline: none; transition: border-color 0.2s, box-shadow 0.2s;
     }
-    .settings-input {
-      width: 100%;
-      background: #f8fafc;
-      border: 1.5px solid #e2e8f0;
-      border-radius: 10px;
-      color: #1e293b;
-      font-size: 12px;
-      font-family: monospace;
-      padding: 12px 14px;
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .settings-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+    .s-input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
 
-    .settings-actions { display: flex; gap: 10px; margin-top: 14px; }
-    .btn-test {
-      flex: 1;
-      padding: 10px 16px;
-      background: #eff6ff;
-      border: 1.5px solid #bfdbfe;
-      border-radius: 10px;
-      color: #2563eb;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
+    .s-actions { display: flex; gap: 10px; margin-top: 14px; }
+    .s-btn-test {
+      flex: 1; padding: 10px; background: var(--blue-light);
+      border: 1.5px solid var(--blue-border); border-radius: 10px;
+      color: var(--blue); font-size: 13px; font-weight: 600; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
       transition: all 0.15s;
     }
-    .btn-test:hover { background: #dbeafe; }
-    .btn-test svg { width: 14px; height: 14px; }
-    .btn-save {
-      flex: 1;
-      padding: 10px 16px;
-      background: #2563eb;
-      border: none;
-      border-radius: 10px;
-      color: #fff;
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      box-shadow: 0 2px 8px rgba(37,99,235,0.25);
-      transition: background 0.15s;
+    .s-btn-test:hover { background: #dbeafe; }
+    .s-btn-test svg { width: 14px; height: 14px; }
+    .s-btn-save {
+      flex: 1; padding: 10px; background: var(--blue); border: none;
+      border-radius: 10px; color: #fff; font-size: 13px; font-weight: 700;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
+      box-shadow: 0 2px 8px rgba(37,99,235,0.25); transition: background 0.15s;
     }
-    .btn-save:hover { background: #1d4ed8; }
-    .btn-save svg { width: 14px; height: 14px; }
+    .s-btn-save:hover { background: var(--blue-hover); }
+    .s-btn-save svg { width: 14px; height: 14px; }
 
     #conn-status {
-      margin-top: 12px;
-      padding: 10px 14px;
-      border-radius: 10px;
-      font-size: 12px;
-      font-weight: 600;
-      display: none;
-      align-items: center;
-      gap: 8px;
+      margin-top: 12px; padding: 10px 14px; border-radius: 10px;
+      font-size: 12px; font-weight: 600; display: none; align-items: center; gap: 8px;
     }
     #conn-status.testing { display:flex; background:#fefce8; border:1px solid #fde68a; color:#b45309; }
     #conn-status.ok      { display:flex; background:#f0fdf4; border:1px solid #bbf7d0; color:#15803d; }
     #conn-status.fail    { display:flex; background:#fef2f2; border:1px solid #fecaca; color:#dc2626; }
-    .conn-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; background:currentColor; }
+    .c-dot { width:7px; height:7px; border-radius:50%; background:currentColor; flex-shrink:0; }
 
-    .settings-divider { border: none; border-top: 1px solid #f1f5f9; margin: 20px 0; }
-    .settings-hint { font-size: 11.5px; color: #94a3b8; line-height: 1.75; }
-    .settings-hint strong { color: #64748b; }
-    .settings-hint code { color: #2563eb; background: #eff6ff; padding: 1px 5px; border-radius: 4px; font-family: monospace; }
+    .s-divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+    .s-hint { font-size: 11.5px; color: #9ca3af; line-height: 1.75; }
+    .s-hint strong { color: var(--muted); }
+    .s-hint code { color: var(--blue); background: var(--blue-light); padding: 1px 5px; border-radius: 4px; font-family: monospace; }
 
-    /* Camera Overlay — light theme */
-    #camera-bridge-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(241,245,249,0.97);
-      backdrop-filter: blur(8px);
-      z-index: 999999;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      gap: 16px;
+    /* ── Camera Overlay — light, side-by-side ── */
+    #cam-overlay {
+      display: none; position: fixed; inset: 0; z-index: 999999;
+      background: rgba(244,246,249,0.97);
+      backdrop-filter: blur(10px);
+      align-items: center; justify-content: center;
+      padding: 24px; gap: 20px;
     }
-    #camera-bridge-overlay.active { display: flex; }
+    #cam-overlay.active { display: flex; }
 
-    .bridge-viewport-card {
-      position: relative;
-      width: 100%;
-      max-width: 680px;
-      height: 420px;
-      background: #000;
+    .cam-layout {
+      width: 100%; max-width: 1000px;
+      display: flex; gap: 20px; align-items: stretch;
+    }
+
+    /* Left: video feed */
+    .cam-feed {
+      flex: 3;
+      background: #0f172a;
       border-radius: 16px;
       overflow: hidden;
-      border: 2px solid #cbd5e1;
+      border: 1.5px solid var(--border);
       box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      position: relative;
+      min-height: 380px;
+      display: flex; align-items: center; justify-content: center;
     }
-    #bridge-video { width:100%; height:100%; object-fit:contain; background:#000; }
+    #bridge-video { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-    .overlay-top-bar {
-      position: absolute;
-      top:0; left:0; right:0;
-      padding: 12px 16px;
-      background: linear-gradient(180deg,rgba(255,255,255,0.9) 0%,transparent 100%);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      z-index: 20;
+    .feed-badge-row {
+      position: absolute; top: 14px; left: 14px; right: 14px;
+      display: flex; justify-content: space-between; align-items: center;
+      z-index: 10;
     }
-
-    @keyframes pulse-rec {
-      0%,100% { opacity:1; transform:scale(1); }
-      50%      { opacity:0.3; transform:scale(0.9); }
+    .rec-pill {
+      display: flex; align-items: center; gap: 7px;
+      background: #fef2f2; border: 1px solid #fecaca;
+      padding: 5px 12px; border-radius: 99px;
+      font-size: 12px; font-weight: 800; color: #dc2626;
+      font-family: 'SF Mono', monospace;
     }
-    .animate-rec { animation: pulse-rec 1s ease-in-out infinite; }
-
-    .rec-badge {
-      display:flex; align-items:center; gap:8px;
-      background:#fef2f2; border:1px solid #fecaca;
-      padding:4px 14px; border-radius:9999px;
-      color:#dc2626; font-size:13px; font-weight:800; font-family:monospace;
-    }
-    .rec-dot { width:10px; height:10px; background:#ef4444; border-radius:50%; }
-    .seal-badge {
-      background:#eff6ff; border:1px solid #bfdbfe;
-      color:#2563eb; padding:4px 14px; border-radius:9999px;
-      font-size:13px; font-family:monospace; font-weight:700;
+    .rec-dot { width: 9px; height: 9px; background: #ef4444; border-radius: 50%; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+    .rec-dot { animation: blink 1s ease-in-out infinite; }
+    .timer-pill {
+      background: var(--card); border: 1px solid var(--border);
+      padding: 5px 12px; border-radius: 99px;
+      font-size: 13px; font-weight: 700; color: var(--text);
+      font-family: 'SF Mono', monospace;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
     }
 
-    .bridge-controls { display:flex; gap:12px; width:100%; max-width:680px; justify-content:center; }
-    .btn-done {
-      flex:1; padding:14px 24px; background:#059669; color:#fff;
-      font-size:15px; font-weight:700; border:none; border-radius:12px; cursor:pointer;
-      box-shadow:0 4px 12px rgba(5,150,105,0.25); transition:all 0.15s;
+    /* Right: controls panel */
+    .cam-panel {
+      flex: 1.2;
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      padding: 24px 20px;
+      display: flex; flex-direction: column; gap: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      min-width: 220px;
     }
-    .btn-done:hover { background:#047857; }
-    .btn-cancel {
-      padding:14px 24px; background:#fff; color:#64748b;
-      border:1px solid #e2e8f0; border-radius:12px;
-      font-size:14px; font-weight:600; cursor:pointer;
-      box-shadow:0 1px 4px rgba(0,0,0,0.06);
-    }
-    .btn-cancel:hover { background:#f1f5f9; color:#1e293b; }
+    .cam-panel-title { font-size: 13px; font-weight: 700; color: var(--text); }
+    .cam-panel-sub   { font-size: 11.5px; color: var(--muted); line-height: 1.6; margin-top: 4px; }
 
-    #bridge-error {
-      color:#dc2626; font-size:13px; text-align:center;
-      padding:10px 16px; background:#fef2f2;
-      border:1px solid #fecaca; border-radius:8px;
-      display:none; max-width:680px; width:100%;
+    .seal-tag-box {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 10px; padding: 14px;
+    }
+    .seal-tag-label { font-size: 10px; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 6px; }
+    .seal-tag-value { font-size: 14px; font-weight: 700; color: var(--blue); font-family: monospace; word-break: break-all; }
+
+    .cam-divider { border: none; border-top: 1px solid var(--border); }
+
+    .cam-btn-done {
+      width: 100%; padding: 13px; border: none; border-radius: 11px;
+      background: var(--blue); color: #fff;
+      font-size: 13px; font-weight: 700; cursor: pointer;
+      box-shadow: 0 2px 8px rgba(37,99,235,0.25);
+      transition: background 0.15s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .cam-btn-done:hover { background: var(--blue-hover); }
+    .cam-btn-done svg { width: 15px; height: 15px; }
+
+    .cam-btn-cancel {
+      width: 100%; padding: 11px; border: 1px solid var(--border);
+      border-radius: 11px; background: var(--bg); color: var(--muted);
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      transition: all 0.15s;
+    }
+    .cam-btn-cancel:hover { background: var(--border); color: var(--text); }
+
+    #cam-error {
+      font-size: 12px; color: #dc2626; background: #fef2f2;
+      border: 1px solid #fecaca; border-radius: 8px;
+      padding: 10px 12px; display: none; line-height: 1.5;
+    }
+
+    /* ── Responsive: stack on small screens ──── */
+    @media (max-width: 640px) {
+      .cam-layout { flex-direction: column; }
+      .cam-feed { min-height: 240px; }
     }
   </style>
 </head>
@@ -270,236 +238,211 @@
   <!-- Settings Button -->
   <button id="settings-btn" onclick="openSettings()" title="Settings">
     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
     </svg>
   </button>
 
   <!-- Settings Modal -->
   <div id="settings-modal">
-    <div class="settings-card">
-
-      <div class="settings-header">
-        <div class="settings-title">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-          </svg>
+    <div class="s-card">
+      <div class="s-header">
+        <div class="s-title">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
           Bridge Settings
         </div>
-        <button class="settings-close" onclick="closeSettings()">&#x2715;</button>
+        <button class="s-close" onclick="closeSettings()">&#x2715;</button>
       </div>
 
-      <div class="settings-label">Google Apps Script URL</div>
-      <input
-        id="gas-url-input"
-        class="settings-input"
-        type="url"
-        placeholder="https://script.google.com/a/macros/..."
-        spellcheck="false"
-      />
+      <div class="s-label">Google Apps Script URL</div>
+      <input id="gas-url-input" class="s-input" type="url" placeholder="https://script.google.com/a/macros/..." spellcheck="false"/>
 
-      <div class="settings-actions">
-        <button class="btn-test" onclick="testConnection()">
+      <div class="s-actions">
+        <button class="s-btn-test" onclick="testConn()">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
           Test Connection
         </button>
-        <button class="btn-save" onclick="saveAndApply()">
+        <button class="s-btn-save" onclick="saveApply()">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
           Save &amp; Apply
         </button>
       </div>
 
-      <div id="conn-status">
-        <div class="conn-dot"></div>
-        <span id="conn-status-text"></span>
+      <div id="conn-status"><div class="c-dot"></div><span id="conn-msg"></span></div>
+
+      <hr class="s-divider">
+      <div class="s-hint">
+        <strong>After redeploying GAS:</strong><br>
+        1. Copy the new <code>/exec</code> URL from Apps Script<br>
+        2. Paste above &rarr; Test Connection &rarr; Save &amp; Apply<br>
+        No GitHub push needed. Saved in browser local storage.
       </div>
-
-      <hr class="settings-divider">
-
-      <div class="settings-hint">
-        <strong>How to update after redeploying GAS:</strong><br>
-        1. Deploy new version in Apps Script, copy the new <code>/exec</code> URL<br>
-        2. Paste it above and click <strong>Test Connection</strong><br>
-        3. Click <strong>Save &amp; Apply</strong> &mdash; done. No GitHub push needed.<br><br>
-        URL is saved in your browser local storage.
-      </div>
-
     </div>
   </div>
 
-  <!-- Camera Bridge Overlay -->
-  <div id="camera-bridge-overlay">
-    <div id="bridge-error"></div>
+  <!-- Camera Overlay — side by side -->
+  <div id="cam-overlay">
+    <div class="cam-layout">
 
-    <div class="bridge-viewport-card">
-      <div class="overlay-top-bar">
-        <div class="rec-badge">
-          <span class="rec-dot animate-rec"></span>
-          <span>REC</span>
-          <span id="bridgeRecTimer">00:00</span>
+      <!-- Left: live video -->
+      <div class="cam-feed">
+        <div class="feed-badge-row">
+          <div class="rec-pill">
+            <span class="rec-dot"></span>
+            REC
+          </div>
+          <div class="timer-pill" id="recTimer">00:00</div>
         </div>
-        <div class="seal-badge" id="bridgeSealDisplay">SEAL: --</div>
+        <video id="bridge-video" autoplay playsinline muted></video>
       </div>
-      <video id="bridge-video" autoplay playsinline muted></video>
-    </div>
 
-    <div class="bridge-controls">
-      <button class="btn-done" onclick="finishAndSendRecording()">
-        Done &mdash; Finish &amp; Scan Bag ID
-      </button>
-      <button class="btn-cancel" onclick="cancelCameraBridge()">
-        Cancel
-      </button>
+      <!-- Right: controls -->
+      <div class="cam-panel">
+        <div>
+          <div class="cam-panel-title">Camera Recording</div>
+          <div class="cam-panel-sub">Inspect the bagging, then click Done when finished.</div>
+        </div>
+
+        <div class="seal-tag-box">
+          <div class="seal-tag-label">Seal ID</div>
+          <div class="seal-tag-value" id="sealDisplay">--</div>
+        </div>
+
+        <hr class="cam-divider">
+
+        <div id="cam-error"></div>
+
+        <button class="cam-btn-done" onclick="finishRecording()">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+          Done — Scan Bag ID
+        </button>
+        <button class="cam-btn-cancel" onclick="cancelRecording()">Cancel</button>
+      </div>
+
     </div>
   </div>
 
   <script>
-    var DEFAULT_GAS_URL = 'https://script.google.com/a/macros/myntra.com/s/AKfycbzMG3DolVegPYZy_TCdcpjeJR5rGxE1QvqH7mkvbcbLK-uA2iLVgQ8MKpLgEQ1wR25v/exec';
+    var DEFAULT_URL = 'https://script.google.com/a/macros/myntra.com/s/AKfycbzMG3DolVegPYZy_TCdcpjeJR5rGxE1QvqH7mkvbcbLK-uA2iLVgQ8MKpLgEQ1wR25v/exec';
     var LS_KEY = 'bvms_gas_url';
 
-    (function init() {
+    (function() {
       var saved = localStorage.getItem(LS_KEY);
-      if (saved && saved.trim()) document.getElementById('app-frame').src = saved.trim();
+      if (saved) document.getElementById('app-frame').src = saved;
     })();
 
+    /* Settings */
     function openSettings() {
-      var current = localStorage.getItem(LS_KEY) || document.getElementById('app-frame').src;
-      document.getElementById('gas-url-input').value = current;
-      setConnStatus('');
+      document.getElementById('gas-url-input').value = localStorage.getItem(LS_KEY) || document.getElementById('app-frame').src;
+      setConn('');
       document.getElementById('settings-modal').classList.add('open');
     }
     function closeSettings() { document.getElementById('settings-modal').classList.remove('open'); }
     document.getElementById('settings-modal').addEventListener('click', function(e) { if (e.target === this) closeSettings(); });
 
-    function saveAndApply() {
+    function saveApply() {
       var url = document.getElementById('gas-url-input').value.trim();
-      if (!url || !url.startsWith('https://')) { setConnStatus('fail', 'Enter a valid https:// URL'); return; }
+      if (!url.startsWith('https://')) { setConn('fail', 'Enter a valid https:// URL'); return; }
       localStorage.setItem(LS_KEY, url);
       document.getElementById('app-frame').src = url;
-      setConnStatus('ok', 'Saved — GAS app reloading...');
+      setConn('ok', 'Saved — reloading GAS app');
       setTimeout(closeSettings, 1400);
     }
-
-    function testConnection() {
+    function testConn() {
       var url = document.getElementById('gas-url-input').value.trim();
-      if (!url || !url.startsWith('https://')) { setConnStatus('fail', 'Enter a valid URL first'); return; }
-      setConnStatus('testing', 'Testing connection...');
-      fetch(url, { method: 'GET', mode: 'no-cors', cache: 'no-store' })
-        .then(function() { setConnStatus('ok', 'Connected — GAS app is reachable'); })
-        .catch(function(err) { setConnStatus('fail', 'Unreachable: ' + err.message); });
+      if (!url.startsWith('https://')) { setConn('fail', 'Enter a valid URL first'); return; }
+      setConn('testing', 'Testing connection...');
+      fetch(url, { mode: 'no-cors', cache: 'no-store' })
+        .then(function() { setConn('ok', 'Connected — GAS app is reachable'); })
+        .catch(function(e) { setConn('fail', 'Unreachable: ' + e.message); });
     }
-
-    function setConnStatus(type, msg) {
+    function setConn(type, msg) {
       var el = document.getElementById('conn-status');
-      var txt = document.getElementById('conn-status-text');
-      el.className = type || '';
-      el.style.display = type ? 'flex' : 'none';
-      txt.textContent = msg || '';
+      el.className = type || ''; el.style.display = type ? 'flex' : 'none';
+      document.getElementById('conn-msg').textContent = msg || '';
     }
 
-    // Camera Bridge
-    var overlay      = document.getElementById('camera-bridge-overlay');
-    var video        = document.getElementById('bridge-video');
-    var errorBox     = document.getElementById('bridge-error');
-    var gasFrame     = document.getElementById('app-frame');
-    var timerDisplay = document.getElementById('bridgeRecTimer');
-    var sealDisplay  = document.getElementById('bridgeSealDisplay');
+    /* Camera Bridge */
+    var overlay   = document.getElementById('cam-overlay');
+    var video     = document.getElementById('bridge-video');
+    var errBox    = document.getElementById('cam-error');
+    var gasFrame  = document.getElementById('app-frame');
+    var timerEl   = document.getElementById('recTimer');
+    var sealEl    = document.getElementById('sealDisplay');
 
-    var activeStream = null, mediaRecorder = null, recordedChunks = [];
-    var timerInterval = null, startTime = 0;
-    var recordingStartISO = '', recordingEndISO = '';
-    var elapsedSeconds = 0, currentSealId = '', gasWindow = null;
+    var stream = null, recorder = null, chunks = [];
+    var timerInterval = null, t0 = 0;
+    var elapsed = 0, startISO = '', endISO = '';
+    var currentSeal = '', gasWin = null;
 
-    window.addEventListener('message', function(event) {
-      var data = event.data;
-      if (!data || typeof data !== 'object') return;
-      if (data.type === 'START_RECORDING') { currentSealId = data.sealId || ''; gasWindow = event.source; startCameraBridgeRecording(); }
-      if (data.type === 'STOP_RECORDING')  { finishAndSendRecording(); }
-      if (data.type === 'CLOSE_CAMERA')    { closeCameraBridge(); }
+    window.addEventListener('message', function(e) {
+      var d = e.data;
+      if (!d || typeof d !== 'object') return;
+      if (d.type === 'START_RECORDING') { currentSeal = d.sealId || ''; gasWin = e.source; startRecording(); }
+      if (d.type === 'STOP_RECORDING')  { finishRecording(); }
+      if (d.type === 'CLOSE_CAMERA')    { closeOverlay(); }
     });
 
-    function startCameraBridgeRecording() {
-      errorBox.style.display = 'none';
-      sealDisplay.textContent = 'SEAL: ' + currentSealId;
+    function startRecording() {
+      errBox.style.display = 'none';
+      sealEl.textContent = currentSeal || '--';
       overlay.classList.add('active');
 
       navigator.mediaDevices.getUserMedia({
-        video: { width: { ideal: 854 }, height: { ideal: 480 }, frameRate: { ideal: 24, max: 30 } },
+        video: { width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 24 } },
         audio: false
-      }).then(function(stream) {
-        activeStream = stream;
-        video.srcObject = stream;
-
-        recordedChunks = [];
-        var mimeType = 'video/webm;codecs=vp9';
-        if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'video/webm;codecs=vp8';
-        if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'video/webm';
-
-        mediaRecorder = new MediaRecorder(stream, { mimeType: mimeType, videoBitsPerSecond: 300000 });
-        mediaRecorder.ondataavailable = function(e) { if (e.data && e.data.size > 0) recordedChunks.push(e.data); };
-        mediaRecorder.start(1000);
-
-        startTime = Date.now();
-        recordingStartISO = new Date().toISOString();
-        recordingEndISO = '';
-        elapsedSeconds = 0;
-        timerDisplay.textContent = '00:00';
+      }).then(function(s) {
+        stream = s; video.srcObject = s;
+        chunks = [];
+        var mime = 'video/webm;codecs=vp9';
+        if (!MediaRecorder.isTypeSupported(mime)) mime = 'video/webm;codecs=vp8';
+        if (!MediaRecorder.isTypeSupported(mime)) mime = 'video/webm';
+        recorder = new MediaRecorder(s, { mimeType: mime, videoBitsPerSecond: 300000 });
+        recorder.ondataavailable = function(e) { if (e.data && e.data.size > 0) chunks.push(e.data); };
+        recorder.start(1000);
+        t0 = Date.now(); elapsed = 0; startISO = new Date().toISOString(); endISO = '';
+        timerEl.textContent = '00:00';
         clearInterval(timerInterval);
         timerInterval = setInterval(function() {
-          elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
-          var m = Math.floor(elapsedSeconds / 60).toString().padStart(2, '0');
-          var s = (elapsedSeconds % 60).toString().padStart(2, '0');
-          timerDisplay.textContent = m + ':' + s;
+          elapsed = Math.floor((Date.now() - t0) / 1000);
+          timerEl.textContent = pad(Math.floor(elapsed/60)) + ':' + pad(elapsed%60);
         }, 1000);
-
-      }).catch(function(err) { showError('Camera access denied: ' + err.message); });
+      }).catch(function(err) { showErr('Camera access denied: ' + err.message); });
     }
 
-    function finishAndSendRecording() {
-      if (!mediaRecorder || mediaRecorder.state === 'inactive') { closeCameraBridge(); return; }
+    function finishRecording() {
+      if (!recorder || recorder.state === 'inactive') { closeOverlay(); return; }
       clearInterval(timerInterval);
-      recordingEndISO = new Date().toISOString();
-
-      mediaRecorder.onstop = function() {
-        var blob = new Blob(recordedChunks, { type: 'video/webm' });
-        var sizeInMB = (blob.size / (1024 * 1024)).toFixed(2);
+      endISO = new Date().toISOString();
+      recorder.onstop = function() {
+        var blob = new Blob(chunks, { type: 'video/webm' });
+        var mb = (blob.size / 1048576).toFixed(2);
         var reader = new FileReader();
         reader.onloadend = function() {
-          var targetWindow = gasWindow || gasFrame.contentWindow;
-          if (targetWindow) {
-            targetWindow.postMessage({
-              type: 'RECORDING_COMPLETE',
-              videoBase64: reader.result,
-              durationSeconds: elapsedSeconds,
-              fileSizeMB: sizeInMB,
-              recordingStartISO: recordingStartISO,
-              recordingEndISO: recordingEndISO
-            }, '*');
-          }
-          closeCameraBridge();
+          var win = gasWin || gasFrame.contentWindow;
+          if (win) win.postMessage({ type: 'RECORDING_COMPLETE', videoBase64: reader.result, durationSeconds: elapsed, fileSizeMB: mb, recordingStartISO: startISO, recordingEndISO: endISO }, '*');
+          closeOverlay();
         };
         reader.readAsDataURL(blob);
       };
-      mediaRecorder.stop();
+      recorder.stop();
     }
 
-    function cancelCameraBridge() {
-      var targetWindow = gasWindow || gasFrame.contentWindow;
-      if (targetWindow) targetWindow.postMessage({ type: 'RECORDING_CANCELLED' }, '*');
-      closeCameraBridge();
+    function cancelRecording() {
+      var win = gasWin || gasFrame.contentWindow;
+      if (win) win.postMessage({ type: 'RECORDING_CANCELLED' }, '*');
+      closeOverlay();
     }
 
-    function closeCameraBridge() {
+    function closeOverlay() {
       clearInterval(timerInterval);
-      if (activeStream) { activeStream.getTracks().forEach(function(t) { t.stop(); }); activeStream = null; }
+      if (stream) { stream.getTracks().forEach(function(t) { t.stop(); }); stream = null; }
       if (video) video.srcObject = null;
       overlay.classList.remove('active');
     }
 
-    function showError(msg) { errorBox.textContent = msg; errorBox.style.display = 'block'; }
+    function showErr(msg) { errBox.textContent = msg; errBox.style.display = 'block'; }
+    function pad(n) { return String(Math.floor(n)).padStart(2, '0'); }
   </script>
 </body>
 </html>
