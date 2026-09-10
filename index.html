@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Bagging & Seal Video Verification System</title>
+  <title>Bagging &amp; Seal Video Verification System</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -21,9 +21,153 @@
       display: block;
     }
 
-    /* ─── Top-Level Camera Overlay ────────────────────────
-       Lives outside the GAS iframe with 100% native getUserMedia() access
-    ────────────────────────────────────────────────────── */
+    /* ─── Settings Button ─────────────────────────── */
+    #settings-btn {
+      position: fixed;
+      top: 12px;
+      right: 12px;
+      z-index: 888888;
+      width: 36px;
+      height: 36px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 50%;
+      color: #94a3b8;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(8px);
+      transition: all 0.2s;
+    }
+    #settings-btn:hover { background: rgba(30,41,59,0.95); color: #fff; border-color: rgba(255,255,255,0.25); }
+
+    /* ─── Settings Modal ──────────────────────────── */
+    #settings-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 999998;
+      background: rgba(2, 6, 23, 0.85);
+      backdrop-filter: blur(10px);
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    #settings-modal.open { display: flex; }
+
+    .settings-card {
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 20px;
+      padding: 28px 24px;
+      width: 100%;
+      max-width: 520px;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8);
+    }
+    .settings-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .settings-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #f1f5f9;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .settings-close {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #94a3b8;
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .settings-close:hover { color: #fff; background: rgba(255,255,255,0.12); }
+    .settings-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+    }
+    .settings-input {
+      width: 100%;
+      background: #020617;
+      border: 1.5px solid #1e293b;
+      border-radius: 10px;
+      color: #e2e8f0;
+      font-size: 12px;
+      font-family: monospace;
+      padding: 12px 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .settings-input:focus { border-color: #3b82f6; }
+    .settings-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .btn-test {
+      flex: 1;
+      padding: 11px 16px;
+      background: rgba(59,130,246,0.1);
+      border: 1.5px solid rgba(59,130,246,0.4);
+      border-radius: 10px;
+      color: #60a5fa;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-test:hover { background: rgba(59,130,246,0.2); }
+    .btn-save {
+      flex: 1;
+      padding: 11px 16px;
+      background: #2563eb;
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-save:hover { background: #1d4ed8; }
+
+    #conn-status {
+      margin-top: 14px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      display: none;
+      align-items: center;
+      gap: 8px;
+    }
+    #conn-status.testing { display:flex; background:rgba(251,191,36,0.1); border:1px solid rgba(251,191,36,0.3); color:#fbbf24; }
+    #conn-status.ok      { display:flex; background:rgba(16,185,129,0.1);  border:1px solid rgba(16,185,129,0.3);  color:#34d399; }
+    #conn-status.fail    { display:flex; background:rgba(239,68,68,0.1);   border:1px solid rgba(239,68,68,0.3);   color:#f87171; }
+    .conn-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; background:currentColor; }
+
+    .settings-divider { border:none; border-top:1px solid #1e293b; margin:20px 0; }
+    .settings-hint { font-size:11px; color:#475569; line-height:1.7; }
+    .settings-hint strong { color:#94a3b8; }
+    .settings-hint code { color:#60a5fa; }
+
+    /* ─── Camera Bridge Overlay ──────────────────── */
     #camera-bridge-overlay {
       display: none;
       position: fixed;
@@ -37,10 +181,7 @@
       padding: 16px;
       gap: 16px;
     }
-
-    #camera-bridge-overlay.active {
-      display: flex;
-    }
+    #camera-bridge-overlay.active { display: flex; }
 
     .bridge-viewport-card {
       position: relative;
@@ -51,26 +192,18 @@
       border-radius: 16px;
       overflow: hidden;
       border: 2px solid #3b82f6;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7);
       display: flex;
       align-items: center;
       justify-content: center;
     }
-
-    #bridge-video {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      background: #000;
-    }
+    #bridge-video { width:100%; height:100%; object-fit:contain; background:#000; }
 
     .overlay-top-bar {
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
+      top: 0; left: 0; right: 0;
       padding: 12px 16px;
-      background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, transparent 100%);
+      background: linear-gradient(180deg,rgba(0,0,0,0.85) 0%,transparent 100%);
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -78,105 +211,102 @@
     }
 
     @keyframes pulse-recording {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.3; transform: scale(0.9); }
+      0%,100% { opacity:1; transform:scale(1); }
+      50%      { opacity:0.3; transform:scale(0.9); }
     }
-    .animate-rec {
-      animation: pulse-recording 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    }
+    .animate-rec { animation: pulse-recording 1s cubic-bezier(0.4,0,0.6,1) infinite; }
 
     .rec-badge {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(69, 10, 10, 0.9);
-      border: 1px solid rgba(239, 68, 68, 0.6);
-      padding: 4px 14px;
-      border-radius: 9999px;
-      color: #f87171;
-      font-size: 13px;
-      font-weight: 800;
-      font-family: monospace;
+      display:flex; align-items:center; gap:8px;
+      background:rgba(69,10,10,0.9); border:1px solid rgba(239,68,68,0.6);
+      padding:4px 14px; border-radius:9999px;
+      color:#f87171; font-size:13px; font-weight:800; font-family:monospace;
     }
-
-    .rec-dot {
-      width: 10px;
-      height: 10px;
-      background: #ef4444;
-      border-radius: 50%;
-    }
+    .rec-dot { width:10px; height:10px; background:#ef4444; border-radius:50%; }
 
     .seal-badge {
-      background: rgba(15, 23, 42, 0.9);
-      border: 1px solid rgba(59, 130, 246, 0.6);
-      color: #60a5fa;
-      padding: 4px 14px;
-      border-radius: 9999px;
-      font-size: 13px;
-      font-family: monospace;
-      font-weight: 700;
+      background:rgba(15,23,42,0.9); border:1px solid rgba(59,130,246,0.6);
+      color:#60a5fa; padding:4px 14px; border-radius:9999px;
+      font-size:13px; font-family:monospace; font-weight:700;
     }
 
-    .bridge-controls {
-      display: flex;
-      gap: 12px;
-      width: 100%;
-      max-width: 680px;
-      justify-content: center;
-    }
-
+    .bridge-controls { display:flex; gap:12px; width:100%; max-width:680px; justify-content:center; }
     .btn-done {
-      flex: 1;
-      padding: 16px 24px;
-      background: #059669;
-      color: #fff;
-      font-size: 16px;
-      font-weight: 700;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3);
-      transition: all 0.15s;
+      flex:1; padding:16px 24px; background:#059669; color:#fff;
+      font-size:16px; font-weight:700; border:none; border-radius:12px; cursor:pointer;
+      box-shadow:0 10px 15px -3px rgba(16,185,129,0.3); transition:all 0.15s;
     }
-    .btn-done:hover { background: #10b981; }
-
+    .btn-done:hover { background:#10b981; }
     .btn-cancel {
-      padding: 16px 24px;
-      background: rgba(255, 255, 255, 0.1);
-      color: #94a3b8;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 12px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
+      padding:16px 24px; background:rgba(255,255,255,0.1); color:#94a3b8;
+      border:1px solid rgba(255,255,255,0.15); border-radius:12px;
+      font-size:14px; font-weight:600; cursor:pointer;
     }
-    .btn-cancel:hover { background: rgba(255, 255, 255, 0.2); color: #fff; }
+    .btn-cancel:hover { background:rgba(255,255,255,0.2); color:#fff; }
 
     #bridge-error {
-      color: #ef4444;
-      font-size: 13px;
-      text-align: center;
-      padding: 10px 16px;
-      background: rgba(239, 68, 68, 0.1);
-      border: 1px solid rgba(239, 68, 68, 0.3);
-      border-radius: 8px;
-      display: none;
-      max-width: 680px;
-      width: 100%;
+      color:#ef4444; font-size:13px; text-align:center;
+      padding:10px 16px; background:rgba(239,68,68,0.1);
+      border:1px solid rgba(239,68,68,0.3); border-radius:8px;
+      display:none; max-width:680px; width:100%;
     }
   </style>
 </head>
 <body>
 
-  <!-- EMBEDDED GOOGLE APPS SCRIPT WEB APP (ORGANIZATION AUTHENTICATED) -->
-  <iframe 
-    id="app-frame" 
-    src="https://script.google.com/a/macros/myntra.com/s/AKfycbzMG3DolVegPYZy_TCdcpjeJR5rGxE1QvqH7mkvbcbLK-uA2iLVgQ8MKpLgEQ1wR25v/exec" 
-    allow="camera; microphone" 
+  <!-- EMBEDDED GAS WEB APP -->
+  <iframe
+    id="app-frame"
+    src="https://script.google.com/a/macros/myntra.com/s/AKfycbzMG3DolVegPYZy_TCdcpjeJR5rGxE1QvqH7mkvbcbLK-uA2iLVgQ8MKpLgEQ1wR25v/exec"
+    allow="camera; microphone"
     allowfullscreen
   ></iframe>
 
-  <!-- TOP-LEVEL CAMERA BRIDGE OVERLAY -->
+  <!-- SETTINGS BUTTON -->
+  <button id="settings-btn" onclick="openSettings()" title="Settings">&#9881;&#65039;</button>
+
+  <!-- SETTINGS MODAL -->
+  <div id="settings-modal">
+    <div class="settings-card">
+
+      <div class="settings-header">
+        <div class="settings-title">&#9881;&#65039; Bridge Settings</div>
+        <button class="settings-close" onclick="closeSettings()">&#x2715;</button>
+      </div>
+
+      <div class="settings-label">Google Apps Script URL</div>
+      <input
+        id="gas-url-input"
+        class="settings-input"
+        type="url"
+        placeholder="https://script.google.com/a/macros/..."
+        spellcheck="false"
+      />
+
+      <div class="settings-actions">
+        <button class="btn-test" onclick="testConnection()">&#128306; Test Connection</button>
+        <button class="btn-save" onclick="saveAndApply()">&#10003; Save &amp; Apply</button>
+      </div>
+
+      <div id="conn-status">
+        <div class="conn-dot"></div>
+        <span id="conn-status-text"></span>
+      </div>
+
+      <hr class="settings-divider">
+
+      <div class="settings-hint">
+        <strong>How to update after redeploying GAS:</strong><br>
+        1. Deploy new version in Apps Script &rarr; copy the new <code>/exec</code> URL<br>
+        2. Paste it above &rarr; click <strong>Test Connection</strong><br>
+        3. Click <strong>Save &amp; Apply</strong> &mdash; done. No GitHub push needed.<br><br>
+        URL is saved in your browser&apos;s local storage.
+      </div>
+
+    </div>
+  </div>
+
+  <!-- CAMERA BRIDGE OVERLAY -->
   <div id="camera-bridge-overlay">
     <div id="bridge-error"></div>
 
@@ -184,45 +314,109 @@
       <div class="overlay-top-bar">
         <div class="rec-badge">
           <span class="rec-dot animate-rec"></span>
-          <span>● REC</span>
+          <span>&#9679; REC</span>
           <span id="bridgeRecTimer">00:00</span>
         </div>
         <div class="seal-badge" id="bridgeSealDisplay">SEAL: --</div>
       </div>
-
       <video id="bridge-video" autoplay playsinline muted></video>
     </div>
 
     <div class="bridge-controls">
       <button id="btnBridgeDone" class="btn-done" onclick="finishAndSendRecording()">
-        ✓ Done (Finish & Scan Bag ID)
+        &#10003; Done (Finish &amp; Scan Bag ID)
       </button>
       <button class="btn-cancel" onclick="cancelCameraBridge()">
-        ✕ Cancel
+        &#x2715; Cancel
       </button>
     </div>
   </div>
 
   <script>
-    var overlay = document.getElementById('camera-bridge-overlay');
-    var video = document.getElementById('bridge-video');
-    var errorBox = document.getElementById('bridge-error');
-    var gasFrame = document.getElementById('app-frame');
+    // ─── Default GAS URL (hardcoded fallback) ─────────
+    var DEFAULT_GAS_URL = 'https://script.google.com/a/macros/myntra.com/s/AKfycbzMG3DolVegPYZy_TCdcpjeJR5rGxE1QvqH7mkvbcbLK-uA2iLVgQ8MKpLgEQ1wR25v/exec';
+    var LS_KEY = 'bvms_gas_url';
+
+    // Apply saved URL from localStorage on load
+    (function init() {
+      var saved = localStorage.getItem(LS_KEY);
+      if (saved && saved.trim()) {
+        document.getElementById('app-frame').src = saved.trim();
+      }
+    })();
+
+    // ─── Settings ─────────────────────────────────────
+    function openSettings() {
+      var current = localStorage.getItem(LS_KEY) || document.getElementById('app-frame').src;
+      document.getElementById('gas-url-input').value = current;
+      setConnStatus('');
+      document.getElementById('settings-modal').classList.add('open');
+    }
+
+    function closeSettings() {
+      document.getElementById('settings-modal').classList.remove('open');
+    }
+
+    document.getElementById('settings-modal').addEventListener('click', function(e) {
+      if (e.target === this) closeSettings();
+    });
+
+    function saveAndApply() {
+      var url = document.getElementById('gas-url-input').value.trim();
+      if (!url || !url.startsWith('https://')) {
+        setConnStatus('fail', 'Enter a valid https:// URL');
+        return;
+      }
+      localStorage.setItem(LS_KEY, url);
+      document.getElementById('app-frame').src = url;
+      setConnStatus('ok', 'Saved! GAS app reloading...');
+      setTimeout(closeSettings, 1400);
+    }
+
+    function testConnection() {
+      var url = document.getElementById('gas-url-input').value.trim();
+      if (!url || !url.startsWith('https://')) {
+        setConnStatus('fail', 'Enter a valid URL first');
+        return;
+      }
+      setConnStatus('testing', 'Testing connection...');
+      // no-cors fetch — resolves if network can reach URL, rejects on network error
+      fetch(url, { method: 'GET', mode: 'no-cors', cache: 'no-store' })
+        .then(function() {
+          setConnStatus('ok', 'Connected — GAS app is reachable');
+        })
+        .catch(function(err) {
+          setConnStatus('fail', 'Unreachable: ' + err.message);
+        });
+    }
+
+    function setConnStatus(type, msg) {
+      var el = document.getElementById('conn-status');
+      var txt = document.getElementById('conn-status-text');
+      el.className = type || '';
+      el.style.display = type ? 'flex' : 'none';
+      txt.textContent = msg || '';
+    }
+
+    // ─── Camera Bridge ────────────────────────────────
+    var overlay      = document.getElementById('camera-bridge-overlay');
+    var video        = document.getElementById('bridge-video');
+    var errorBox     = document.getElementById('bridge-error');
+    var gasFrame     = document.getElementById('app-frame');
     var timerDisplay = document.getElementById('bridgeRecTimer');
-    var sealDisplay = document.getElementById('bridgeSealDisplay');
+    var sealDisplay  = document.getElementById('bridgeSealDisplay');
 
-    var activeStream = null;
-    var mediaRecorder = null;
-    var recordedChunks = [];
-    var timerInterval = null;
-    var startTime = 0;
+    var activeStream      = null;
+    var mediaRecorder     = null;
+    var recordedChunks    = [];
+    var timerInterval     = null;
+    var startTime         = 0;
     var recordingStartISO = '';
-    var recordingEndISO = '';
-    var elapsedSeconds = 0;
-    var currentSealId = '';
-    var gasWindow = null;
+    var recordingEndISO   = '';
+    var elapsedSeconds    = 0;
+    var currentSealId     = '';
+    var gasWindow         = null;
 
-    // Listen for messages from the embedded GAS iframe
     window.addEventListener('message', function(event) {
       var data = event.data;
       if (!data || typeof data !== 'object') return;
@@ -232,14 +426,8 @@
         gasWindow = event.source;
         startCameraBridgeRecording();
       }
-
-      if (data.type === 'STOP_RECORDING') {
-        finishAndSendRecording();
-      }
-
-      if (data.type === 'CLOSE_CAMERA') {
-        closeCameraBridge();
-      }
+      if (data.type === 'STOP_RECORDING')  { finishAndSendRecording(); }
+      if (data.type === 'CLOSE_CAMERA')    { closeCameraBridge(); }
     });
 
     function startCameraBridgeRecording() {
@@ -248,40 +436,27 @@
       overlay.classList.add('active');
 
       navigator.mediaDevices.getUserMedia({
-        video: {
-          width: { ideal: 854 },
-          height: { ideal: 480 },
-          frameRate: { ideal: 24, max: 30 }
-        },
+        video: { width: { ideal: 854 }, height: { ideal: 480 }, frameRate: { ideal: 24, max: 30 } },
         audio: false
       }).then(function(stream) {
         activeStream = stream;
         video.srcObject = stream;
 
-        // Initialize MediaRecorder (VP9/VP8 ~300 kbps)
         recordedChunks = [];
         var mimeType = 'video/webm;codecs=vp9';
         if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'video/webm;codecs=vp8';
         if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'video/webm';
 
-        mediaRecorder = new MediaRecorder(stream, {
-          mimeType: mimeType,
-          videoBitsPerSecond: 300000
-        });
-
+        mediaRecorder = new MediaRecorder(stream, { mimeType: mimeType, videoBitsPerSecond: 300000 });
         mediaRecorder.ondataavailable = function(e) {
-          if (e.data && e.data.size > 0) {
-            recordedChunks.push(e.data);
-          }
+          if (e.data && e.data.size > 0) recordedChunks.push(e.data);
         };
-
         mediaRecorder.start(1000);
 
-        // Capture wall-clock start time
         startTime = Date.now();
         recordingStartISO = new Date().toISOString();
-        recordingEndISO = '';
-        elapsedSeconds = 0;
+        recordingEndISO   = '';
+        elapsedSeconds    = 0;
         timerDisplay.textContent = '00:00';
         clearInterval(timerInterval);
         timerInterval = setInterval(function() {
@@ -297,58 +472,42 @@
     }
 
     function finishAndSendRecording() {
-      if (!mediaRecorder || mediaRecorder.state === 'inactive') {
-        closeCameraBridge();
-        return;
-      }
-
+      if (!mediaRecorder || mediaRecorder.state === 'inactive') { closeCameraBridge(); return; }
       clearInterval(timerInterval);
       recordingEndISO = new Date().toISOString();
 
       mediaRecorder.onstop = function() {
         var recordedBlob = new Blob(recordedChunks, { type: 'video/webm' });
         var sizeInMB = (recordedBlob.size / (1024 * 1024)).toFixed(2);
-
-        // Convert Blob to Base64
         var reader = new FileReader();
         reader.onloadend = function() {
-          var base64Data = reader.result;
-
-          // Send result back to GAS iframe
           var targetWindow = gasWindow || gasFrame.contentWindow;
           if (targetWindow) {
             targetWindow.postMessage({
-              type: 'RECORDING_COMPLETE',
-              videoBase64: base64Data,
-              durationSeconds: elapsedSeconds,
-              fileSizeMB: sizeInMB,
+              type:             'RECORDING_COMPLETE',
+              videoBase64:      reader.result,
+              durationSeconds:  elapsedSeconds,
+              fileSizeMB:       sizeInMB,
               recordingStartISO: recordingStartISO,
-              recordingEndISO: recordingEndISO
+              recordingEndISO:   recordingEndISO
             }, '*');
           }
-
           closeCameraBridge();
         };
         reader.readAsDataURL(recordedBlob);
       };
-
       mediaRecorder.stop();
     }
 
     function cancelCameraBridge() {
       var targetWindow = gasWindow || gasFrame.contentWindow;
-      if (targetWindow) {
-        targetWindow.postMessage({ type: 'RECORDING_CANCELLED' }, '*');
-      }
+      if (targetWindow) targetWindow.postMessage({ type: 'RECORDING_CANCELLED' }, '*');
       closeCameraBridge();
     }
 
     function closeCameraBridge() {
       clearInterval(timerInterval);
-      if (activeStream) {
-        activeStream.getTracks().forEach(function(t) { t.stop(); });
-        activeStream = null;
-      }
+      if (activeStream) { activeStream.getTracks().forEach(function(t) { t.stop(); }); activeStream = null; }
       if (video) video.srcObject = null;
       overlay.classList.remove('active');
     }
