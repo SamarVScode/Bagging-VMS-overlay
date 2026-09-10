@@ -216,6 +216,8 @@
     var recordedChunks = [];
     var timerInterval = null;
     var startTime = 0;
+    var recordingStartISO = '';
+    var recordingEndISO = '';
     var elapsedSeconds = 0;
     var currentSealId = '';
     var gasWindow = null;
@@ -275,8 +277,10 @@
 
         mediaRecorder.start(1000);
 
-        // Start timer
+        // Capture wall-clock start time
         startTime = Date.now();
+        recordingStartISO = new Date().toISOString();
+        recordingEndISO = '';
         elapsedSeconds = 0;
         timerDisplay.textContent = '00:00';
         clearInterval(timerInterval);
@@ -299,6 +303,7 @@
       }
 
       clearInterval(timerInterval);
+      recordingEndISO = new Date().toISOString();
 
       mediaRecorder.onstop = function() {
         var recordedBlob = new Blob(recordedChunks, { type: 'video/webm' });
@@ -316,7 +321,9 @@
               type: 'RECORDING_COMPLETE',
               videoBase64: base64Data,
               durationSeconds: elapsedSeconds,
-              fileSizeMB: sizeInMB
+              fileSizeMB: sizeInMB,
+              recordingStartISO: recordingStartISO,
+              recordingEndISO: recordingEndISO
             }, '*');
           }
 
