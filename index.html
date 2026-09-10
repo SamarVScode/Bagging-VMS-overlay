@@ -14,26 +14,20 @@
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       overflow: hidden;
     }
-    #app-frame {
-      width: 100vw;
-      height: 100vh;
-      border: none;
-      display: block;
-    }
+    #app-frame { width: 100vw; height: 100vh; border: none; display: block; }
 
-    /* ─── Settings Button ─────────────────────────── */
+    /* Settings Button */
     #settings-btn {
       position: fixed;
       top: 12px;
       right: 12px;
       z-index: 888888;
-      width: 36px;
-      height: 36px;
+      width: 34px;
+      height: 34px;
       background: #ffffff;
       border: 1px solid #e2e8f0;
       border-radius: 50%;
       color: #64748b;
-      font-size: 16px;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -42,14 +36,15 @@
       transition: all 0.2s;
     }
     #settings-btn:hover { background: #f8fafc; color: #1e293b; box-shadow: 0 2px 8px rgba(0,0,0,0.15); border-color: #cbd5e1; }
+    #settings-btn svg { width: 16px; height: 16px; }
 
-    /* ─── Settings Modal ──────────────────────────── */
+    /* Settings Modal */
     #settings-modal {
       display: none;
       position: fixed;
       inset: 0;
       z-index: 999998;
-      background: rgba(100, 116, 139, 0.4);
+      background: rgba(100,116,139,0.35);
       backdrop-filter: blur(6px);
       align-items: center;
       justify-content: center;
@@ -64,7 +59,7 @@
       padding: 28px 24px;
       width: 100%;
       max-width: 520px;
-      box-shadow: 0 20px 40px -8px rgba(0,0,0,0.15), 0 4px 12px rgba(0,0,0,0.05);
+      box-shadow: 0 20px 40px -8px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.05);
     }
     .settings-header {
       display: flex;
@@ -73,13 +68,14 @@
       margin-bottom: 24px;
     }
     .settings-title {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 700;
       color: #0f172a;
       display: flex;
       align-items: center;
       gap: 10px;
     }
+    .settings-title svg { width: 18px; height: 18px; color: #64748b; }
     .settings-close {
       background: #f1f5f9;
       border: 1px solid #e2e8f0;
@@ -116,16 +112,12 @@
       outline: none;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
-    .settings-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.12); }
+    .settings-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
 
-    .settings-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 16px;
-    }
+    .settings-actions { display: flex; gap: 10px; margin-top: 14px; }
     .btn-test {
       flex: 1;
-      padding: 11px 16px;
+      padding: 10px 16px;
       background: #eff6ff;
       border: 1.5px solid #bfdbfe;
       border-radius: 10px;
@@ -133,12 +125,17 @@
       font-size: 13px;
       font-weight: 600;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
       transition: all 0.15s;
     }
-    .btn-test:hover { background: #dbeafe; border-color: #93c5fd; }
+    .btn-test:hover { background: #dbeafe; }
+    .btn-test svg { width: 14px; height: 14px; }
     .btn-save {
       flex: 1;
-      padding: 11px 16px;
+      padding: 10px 16px;
       background: #2563eb;
       border: none;
       border-radius: 10px;
@@ -146,13 +143,18 @@
       font-size: 13px;
       font-weight: 700;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 2px 8px rgba(37,99,235,0.25);
       transition: background 0.15s;
-      box-shadow: 0 2px 8px rgba(37,99,235,0.3);
     }
     .btn-save:hover { background: #1d4ed8; }
+    .btn-save svg { width: 14px; height: 14px; }
 
     #conn-status {
-      margin-top: 14px;
+      margin-top: 12px;
       padding: 10px 14px;
       border-radius: 10px;
       font-size: 12px;
@@ -166,17 +168,17 @@
     #conn-status.fail    { display:flex; background:#fef2f2; border:1px solid #fecaca; color:#dc2626; }
     .conn-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; background:currentColor; }
 
-    .settings-divider { border:none; border-top:1px solid #f1f5f9; margin:20px 0; }
-    .settings-hint { font-size:11.5px; color:#94a3b8; line-height:1.75; }
-    .settings-hint strong { color:#64748b; }
-    .settings-hint code { color:#2563eb; background:#eff6ff; padding:1px 5px; border-radius:4px; }
+    .settings-divider { border: none; border-top: 1px solid #f1f5f9; margin: 20px 0; }
+    .settings-hint { font-size: 11.5px; color: #94a3b8; line-height: 1.75; }
+    .settings-hint strong { color: #64748b; }
+    .settings-hint code { color: #2563eb; background: #eff6ff; padding: 1px 5px; border-radius: 4px; font-family: monospace; }
 
-    /* ─── Camera Bridge Overlay (stays dark — it's a camera view) ── */
+    /* Camera Overlay (dark — video feed) */
     #camera-bridge-overlay {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(2, 6, 23, 0.97);
+      background: rgba(2,6,23,0.97);
       backdrop-filter: blur(8px);
       z-index: 999999;
       flex-direction: column;
@@ -205,7 +207,7 @@
 
     .overlay-top-bar {
       position: absolute;
-      top: 0; left: 0; right: 0;
+      top:0; left:0; right:0;
       padding: 12px 16px;
       background: linear-gradient(180deg,rgba(0,0,0,0.85) 0%,transparent 100%);
       display: flex;
@@ -214,11 +216,11 @@
       z-index: 20;
     }
 
-    @keyframes pulse-recording {
+    @keyframes pulse-rec {
       0%,100% { opacity:1; transform:scale(1); }
       50%      { opacity:0.3; transform:scale(0.9); }
     }
-    .animate-rec { animation: pulse-recording 1s cubic-bezier(0.4,0,0.6,1) infinite; }
+    .animate-rec { animation: pulse-rec 1s ease-in-out infinite; }
 
     .rec-badge {
       display:flex; align-items:center; gap:8px;
@@ -236,7 +238,7 @@
     .bridge-controls { display:flex; gap:12px; width:100%; max-width:680px; justify-content:center; }
     .btn-done {
       flex:1; padding:16px 24px; background:#059669; color:#fff;
-      font-size:16px; font-weight:700; border:none; border-radius:12px; cursor:pointer;
+      font-size:15px; font-weight:700; border:none; border-radius:12px; cursor:pointer;
       box-shadow:0 10px 15px -3px rgba(16,185,129,0.3); transition:all 0.15s;
     }
     .btn-done:hover { background:#10b981; }
@@ -257,7 +259,6 @@
 </head>
 <body>
 
-  <!-- EMBEDDED GAS WEB APP -->
   <iframe
     id="app-frame"
     src="https://script.google.com/a/macros/myntra.com/s/AKfycbzMG3DolVegPYZy_TCdcpjeJR5rGxE1QvqH7mkvbcbLK-uA2iLVgQ8MKpLgEQ1wR25v/exec"
@@ -265,15 +266,28 @@
     allowfullscreen
   ></iframe>
 
-  <!-- SETTINGS BUTTON -->
-  <button id="settings-btn" onclick="openSettings()" title="Settings">&#9881;&#65039;</button>
+  <!-- Settings Button -->
+  <button id="settings-btn" onclick="openSettings()" title="Settings">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+    </svg>
+  </button>
 
-  <!-- SETTINGS MODAL -->
+  <!-- Settings Modal -->
   <div id="settings-modal">
     <div class="settings-card">
 
       <div class="settings-header">
-        <div class="settings-title">&#9881;&#65039; Bridge Settings</div>
+        <div class="settings-title">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+          Bridge Settings
+        </div>
         <button class="settings-close" onclick="closeSettings()">&#x2715;</button>
       </div>
 
@@ -287,8 +301,14 @@
       />
 
       <div class="settings-actions">
-        <button class="btn-test" onclick="testConnection()">&#128306; Test Connection</button>
-        <button class="btn-save" onclick="saveAndApply()">&#10003; Save &amp; Apply</button>
+        <button class="btn-test" onclick="testConnection()">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          Test Connection
+        </button>
+        <button class="btn-save" onclick="saveAndApply()">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          Save &amp; Apply
+        </button>
       </div>
 
       <div id="conn-status">
@@ -300,16 +320,16 @@
 
       <div class="settings-hint">
         <strong>How to update after redeploying GAS:</strong><br>
-        1. Deploy new version in Apps Script &rarr; copy the new <code>/exec</code> URL<br>
-        2. Paste it above &rarr; click <strong>Test Connection</strong><br>
+        1. Deploy new version in Apps Script, copy the new <code>/exec</code> URL<br>
+        2. Paste it above and click <strong>Test Connection</strong><br>
         3. Click <strong>Save &amp; Apply</strong> &mdash; done. No GitHub push needed.<br><br>
-        URL is saved in your browser&apos;s local storage.
+        URL is saved in your browser local storage.
       </div>
 
     </div>
   </div>
 
-  <!-- CAMERA BRIDGE OVERLAY -->
+  <!-- Camera Bridge Overlay -->
   <div id="camera-bridge-overlay">
     <div id="bridge-error"></div>
 
@@ -317,7 +337,7 @@
       <div class="overlay-top-bar">
         <div class="rec-badge">
           <span class="rec-dot animate-rec"></span>
-          <span>&#9679; REC</span>
+          <span>REC</span>
           <span id="bridgeRecTimer">00:00</span>
         </div>
         <div class="seal-badge" id="bridgeSealDisplay">SEAL: --</div>
@@ -326,11 +346,11 @@
     </div>
 
     <div class="bridge-controls">
-      <button id="btnBridgeDone" class="btn-done" onclick="finishAndSendRecording()">
-        &#10003; Done (Finish &amp; Scan Bag ID)
+      <button class="btn-done" onclick="finishAndSendRecording()">
+        Done &mdash; Finish &amp; Scan Bag ID
       </button>
       <button class="btn-cancel" onclick="cancelCameraBridge()">
-        &#x2715; Cancel
+        Cancel
       </button>
     </div>
   </div>
@@ -339,48 +359,32 @@
     var DEFAULT_GAS_URL = 'https://script.google.com/a/macros/myntra.com/s/AKfycbzMG3DolVegPYZy_TCdcpjeJR5rGxE1QvqH7mkvbcbLK-uA2iLVgQ8MKpLgEQ1wR25v/exec';
     var LS_KEY = 'bvms_gas_url';
 
-    // Apply saved URL from localStorage on load
     (function init() {
       var saved = localStorage.getItem(LS_KEY);
-      if (saved && saved.trim()) {
-        document.getElementById('app-frame').src = saved.trim();
-      }
+      if (saved && saved.trim()) document.getElementById('app-frame').src = saved.trim();
     })();
 
-    // ─── Settings ─────────────────────────────────────
     function openSettings() {
       var current = localStorage.getItem(LS_KEY) || document.getElementById('app-frame').src;
       document.getElementById('gas-url-input').value = current;
       setConnStatus('');
       document.getElementById('settings-modal').classList.add('open');
     }
-
-    function closeSettings() {
-      document.getElementById('settings-modal').classList.remove('open');
-    }
-
-    document.getElementById('settings-modal').addEventListener('click', function(e) {
-      if (e.target === this) closeSettings();
-    });
+    function closeSettings() { document.getElementById('settings-modal').classList.remove('open'); }
+    document.getElementById('settings-modal').addEventListener('click', function(e) { if (e.target === this) closeSettings(); });
 
     function saveAndApply() {
       var url = document.getElementById('gas-url-input').value.trim();
-      if (!url || !url.startsWith('https://')) {
-        setConnStatus('fail', 'Enter a valid https:// URL');
-        return;
-      }
+      if (!url || !url.startsWith('https://')) { setConnStatus('fail', 'Enter a valid https:// URL'); return; }
       localStorage.setItem(LS_KEY, url);
       document.getElementById('app-frame').src = url;
-      setConnStatus('ok', 'Saved! GAS app reloading...');
+      setConnStatus('ok', 'Saved — GAS app reloading...');
       setTimeout(closeSettings, 1400);
     }
 
     function testConnection() {
       var url = document.getElementById('gas-url-input').value.trim();
-      if (!url || !url.startsWith('https://')) {
-        setConnStatus('fail', 'Enter a valid URL first');
-        return;
-      }
+      if (!url || !url.startsWith('https://')) { setConnStatus('fail', 'Enter a valid URL first'); return; }
       setConnStatus('testing', 'Testing connection...');
       fetch(url, { method: 'GET', mode: 'no-cors', cache: 'no-store' })
         .then(function() { setConnStatus('ok', 'Connected — GAS app is reachable'); })
@@ -388,14 +392,14 @@
     }
 
     function setConnStatus(type, msg) {
-      var el  = document.getElementById('conn-status');
+      var el = document.getElementById('conn-status');
       var txt = document.getElementById('conn-status-text');
-      el.className   = type || '';
+      el.className = type || '';
       el.style.display = type ? 'flex' : 'none';
       txt.textContent = msg || '';
     }
 
-    // ─── Camera Bridge ────────────────────────────────
+    // Camera Bridge
     var overlay      = document.getElementById('camera-bridge-overlay');
     var video        = document.getElementById('bridge-video');
     var errorBox     = document.getElementById('bridge-error');
@@ -403,16 +407,10 @@
     var timerDisplay = document.getElementById('bridgeRecTimer');
     var sealDisplay  = document.getElementById('bridgeSealDisplay');
 
-    var activeStream      = null;
-    var mediaRecorder     = null;
-    var recordedChunks    = [];
-    var timerInterval     = null;
-    var startTime         = 0;
-    var recordingStartISO = '';
-    var recordingEndISO   = '';
-    var elapsedSeconds    = 0;
-    var currentSealId     = '';
-    var gasWindow         = null;
+    var activeStream = null, mediaRecorder = null, recordedChunks = [];
+    var timerInterval = null, startTime = 0;
+    var recordingStartISO = '', recordingEndISO = '';
+    var elapsedSeconds = 0, currentSealId = '', gasWindow = null;
 
     window.addEventListener('message', function(event) {
       var data = event.data;
@@ -445,8 +443,8 @@
 
         startTime = Date.now();
         recordingStartISO = new Date().toISOString();
-        recordingEndISO   = '';
-        elapsedSeconds    = 0;
+        recordingEndISO = '';
+        elapsedSeconds = 0;
         timerDisplay.textContent = '00:00';
         clearInterval(timerInterval);
         timerInterval = setInterval(function() {
@@ -456,7 +454,7 @@
           timerDisplay.textContent = m + ':' + s;
         }, 1000);
 
-      }).catch(function(err) { showError('Camera access denied or failed: ' + err.message); });
+      }).catch(function(err) { showError('Camera access denied: ' + err.message); });
     }
 
     function finishAndSendRecording() {
@@ -465,24 +463,24 @@
       recordingEndISO = new Date().toISOString();
 
       mediaRecorder.onstop = function() {
-        var recordedBlob = new Blob(recordedChunks, { type: 'video/webm' });
-        var sizeInMB = (recordedBlob.size / (1024 * 1024)).toFixed(2);
+        var blob = new Blob(recordedChunks, { type: 'video/webm' });
+        var sizeInMB = (blob.size / (1024 * 1024)).toFixed(2);
         var reader = new FileReader();
         reader.onloadend = function() {
           var targetWindow = gasWindow || gasFrame.contentWindow;
           if (targetWindow) {
             targetWindow.postMessage({
-              type:              'RECORDING_COMPLETE',
-              videoBase64:       reader.result,
-              durationSeconds:   elapsedSeconds,
-              fileSizeMB:        sizeInMB,
+              type: 'RECORDING_COMPLETE',
+              videoBase64: reader.result,
+              durationSeconds: elapsedSeconds,
+              fileSizeMB: sizeInMB,
               recordingStartISO: recordingStartISO,
-              recordingEndISO:   recordingEndISO
+              recordingEndISO: recordingEndISO
             }, '*');
           }
           closeCameraBridge();
         };
-        reader.readAsDataURL(recordedBlob);
+        reader.readAsDataURL(blob);
       };
       mediaRecorder.stop();
     }
