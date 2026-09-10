@@ -173,18 +173,18 @@
     .settings-hint strong { color: #64748b; }
     .settings-hint code { color: #2563eb; background: #eff6ff; padding: 1px 5px; border-radius: 4px; font-family: monospace; }
 
-    /* Camera Overlay (dark — video feed) */
+    /* Camera Overlay — light theme */
     #camera-bridge-overlay {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(2,6,23,0.97);
+      background: rgba(241,245,249,0.97);
       backdrop-filter: blur(8px);
       z-index: 999999;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 16px;
+      padding: 20px;
       gap: 16px;
     }
     #camera-bridge-overlay.active { display: flex; }
@@ -197,8 +197,8 @@
       background: #000;
       border-radius: 16px;
       overflow: hidden;
-      border: 2px solid #3b82f6;
-      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7);
+      border: 2px solid #cbd5e1;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -209,7 +209,7 @@
       position: absolute;
       top:0; left:0; right:0;
       padding: 12px 16px;
-      background: linear-gradient(180deg,rgba(0,0,0,0.85) 0%,transparent 100%);
+      background: linear-gradient(180deg,rgba(255,255,255,0.9) 0%,transparent 100%);
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -224,35 +224,36 @@
 
     .rec-badge {
       display:flex; align-items:center; gap:8px;
-      background:rgba(69,10,10,0.9); border:1px solid rgba(239,68,68,0.6);
+      background:#fef2f2; border:1px solid #fecaca;
       padding:4px 14px; border-radius:9999px;
-      color:#f87171; font-size:13px; font-weight:800; font-family:monospace;
+      color:#dc2626; font-size:13px; font-weight:800; font-family:monospace;
     }
     .rec-dot { width:10px; height:10px; background:#ef4444; border-radius:50%; }
     .seal-badge {
-      background:rgba(15,23,42,0.9); border:1px solid rgba(59,130,246,0.6);
-      color:#60a5fa; padding:4px 14px; border-radius:9999px;
+      background:#eff6ff; border:1px solid #bfdbfe;
+      color:#2563eb; padding:4px 14px; border-radius:9999px;
       font-size:13px; font-family:monospace; font-weight:700;
     }
 
     .bridge-controls { display:flex; gap:12px; width:100%; max-width:680px; justify-content:center; }
     .btn-done {
-      flex:1; padding:16px 24px; background:#059669; color:#fff;
+      flex:1; padding:14px 24px; background:#059669; color:#fff;
       font-size:15px; font-weight:700; border:none; border-radius:12px; cursor:pointer;
-      box-shadow:0 10px 15px -3px rgba(16,185,129,0.3); transition:all 0.15s;
+      box-shadow:0 4px 12px rgba(5,150,105,0.25); transition:all 0.15s;
     }
-    .btn-done:hover { background:#10b981; }
+    .btn-done:hover { background:#047857; }
     .btn-cancel {
-      padding:16px 24px; background:rgba(255,255,255,0.1); color:#94a3b8;
-      border:1px solid rgba(255,255,255,0.15); border-radius:12px;
+      padding:14px 24px; background:#fff; color:#64748b;
+      border:1px solid #e2e8f0; border-radius:12px;
       font-size:14px; font-weight:600; cursor:pointer;
+      box-shadow:0 1px 4px rgba(0,0,0,0.06);
     }
-    .btn-cancel:hover { background:rgba(255,255,255,0.2); color:#fff; }
+    .btn-cancel:hover { background:#f1f5f9; color:#1e293b; }
 
     #bridge-error {
-      color:#ef4444; font-size:13px; text-align:center;
-      padding:10px 16px; background:rgba(239,68,68,0.1);
-      border:1px solid rgba(239,68,68,0.3); border-radius:8px;
+      color:#dc2626; font-size:13px; text-align:center;
+      padding:10px 16px; background:#fef2f2;
+      border:1px solid #fecaca; border-radius:8px;
       display:none; max-width:680px; width:100%;
     }
   </style>
