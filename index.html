@@ -330,7 +330,7 @@
     var timerEl   = document.getElementById('recTimer');
     var sealEl    = document.getElementById('sealDisplay');
 
-    var stream = null, recorder = null, chunks = [];
+    var stream = null, recorder = null, chunks = [], currentBlob = null;
     var timerInterval = null, t0 = 0;
     var elapsed = 0, startISO = '', endISO = '';
     var currentSeal = '', gasWin = null;
@@ -338,12 +338,14 @@
     window.addEventListener('message', function(e) {
       var d = e.data;
       if (!d || typeof d !== 'object') return;
-      if (d.type === 'START_RECORDING') { currentSeal = d.sealId || ''; gasWin = e.source; startRecording(); }
-      if (d.type === 'STOP_RECORDING')  { finishRecording(); }
-      if (d.type === 'CLOSE_CAMERA')    { closeOverlay(); }
+      if (d.type === 'START_RECORDING')    { currentSeal = d.sealId || ''; gasWin = e.source; startRecording(); }
+      if (d.type === 'STOP_RECORDING')     { finishRecording(); }
+      if (d.type === 'CLOSE_CAMERA')       { closeOverlay(); }
+      if (d.type === 'START_DRIVE_UPLOAD') { if (e.source) gasWin = e.source; handleDriveUpload(d.uploadUrl); }
     });
 
     function startRecording() {
+      currentBlob = null;
       errBox.style.display = 'none';
       sealEl.textContent = currentSeal || '--';
       overlay.classList.add('active');
@@ -352,7 +354,7 @@
         video: {
           width:     { ideal: 1280 },
           height:    { ideal: 720 },
-          frameRate: { ideal: 24, max: 24 }
+          frameRate: { ideal: 20, max: 20 }
         },
         audio: false
       }).then(function(s) {
@@ -361,7 +363,7 @@
         var mime = 'video/webm;codecs=vp9';
         if (!MediaRecorder.isTypeSupported(mime)) mime = 'video/webm;codecs=vp8';
         if (!MediaRecorder.isTypeSupported(mime)) mime = 'video/webm';
-        recorder = new MediaRecorder(s, { mimeType: mime, videoBitsPerSecond: 800000 });
+        recorder = new MediaRecorder(s, { mimeType: mime, videoBitsPerSecond: 400000 });
         recorder.ondataavailable = function(e) { if (e.data && e.data.size > 0) chunks.push(e.data); };
         recorder.start(1000);
         t0 = Date.now(); elapsed = 0; startISO = new Date().toISOString(); endISO = '';
@@ -379,20 +381,25 @@
       clearInterval(timerInterval);
       endISO = new Date().toISOString();
       recorder.onstop = function() {
-        var blob = new Blob(chunks, { type: 'video/webm' });
-        var mb = (blob.size / 1048576).toFixed(2);
-        var reader = new FileReader();
-        reader.onloadend = function() {
-          var win = gasWin || gasFrame.contentWindow;
-          if (win) win.postMessage({ type: 'RECORDING_COMPLETE', videoBase64: reader.result, durationSeconds: elapsed, fileSizeMB: mb, recordingStartISO: startISO, recordingEndISO: endISO }, '*');
-          closeOverlay();
-        };
-        reader.readAsDataURL(blob);
+        currentBlob = new Blob(chunks, { type: 'video/webm' });
+        var mb = (currentBlob.size / 1048576).toFixed(2);
+        var win = gasWin || gasFrame.contentWindow;
+        if (win) {
+          win.postMessage({
+            type: 'RECORDING_COMPLETE',
+            durationSeconds: elapsed,
+            fileSizeMB: mb,
+            recordingStartISO: startISO,
+            recordingEndISO: endISO
+          }, '*');
+        }
+        closeOverlay();
       };
       recorder.stop();
     }
 
     function cancelRecording() {
+      currentBlob = null;
       var win = gasWin || gasFrame.contentWindow;
       if (win) win.postMessage({ type: 'RECORDING_CANCELLED' }, '*');
       closeOverlay();
@@ -403,6 +410,51 @@
       if (stream) { stream.getTracks().forEach(function(t) { t.stop(); }); stream = null; }
       if (video) video.srcObject = null;
       overlay.classList.remove('active');
+    }
+
+    function handleDriveUpload(uploadUrl) {
+      var win = gasWin || gasFrame.contentWindow;
+      if (!currentBlob) {
+        if (win) win.postMessage({ type: 'UPLOAD_ERROR', error: 'No recorded video available for upload.' }, '*');
+        return;
+      }
+      if (!uploadUrl) {
+        if (win) win.postMessage({ type: 'UPLOAD_ERROR', error: 'Missing Drive upload URL.' }, '*');
+        return;
+      }
+
+      var xhr = new XMLHttpRequest();
+      xhr.open('PUT', uploadUrl, true);
+      xhr.setRequestHeader('Content-Type', 'video/webm');
+
+      xhr.upload.onprogress = function(evt) {
+        if (evt.lengthComputable && evt.total > 0) {
+          var pct = Math.round((evt.loaded / evt.total) * 100);
+          if (win) win.postMessage({ type: 'UPLOAD_PROGRESS', percent: pct }, '*');
+        }
+      };
+
+      xhr.onload = function() {
+        if (xhr.status === 200 || xhr.status === 201) {
+          try {
+            var res = JSON.parse(xhr.responseText);
+            var fileId = res.id;
+            var fileUrl = 'https://drive.google.com/file/d/' + fileId + '/view';
+            currentBlob = null; // Clean up memory on success
+            if (win) win.postMessage({ type: 'UPLOAD_SUCCESS', fileId: fileId, fileUrl: fileUrl }, '*');
+          } catch(e) {
+            if (win) win.postMessage({ type: 'UPLOAD_ERROR', error: 'Failed to parse Drive upload response: ' + e.message }, '*');
+          }
+        } else {
+          if (win) win.postMessage({ type: 'UPLOAD_ERROR', error: 'Drive upload error (' + xhr.status + '): ' + (xhr.responseText || xhr.statusText) }, '*');
+        }
+      };
+
+      xhr.onerror = function() {
+        if (win) win.postMessage({ type: 'UPLOAD_ERROR', error: xhr.responseText || 'Network error during Drive upload.' }, '*');
+      };
+
+      xhr.send(currentBlob);
     }
 
     function showErr(msg) { errBox.textContent = msg; errBox.style.display = 'block'; }
